@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Manager</title>
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+padding:20px;
+max-width:1000px;
+margin:auto;
+}
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+input,textarea{
+width:100%;
+padding:10px;
+margin-top:8px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+button{
+padding:10px 16px;
+border:none;
+background:#111827;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+.item{
+border:1px solid #ddd;
+padding:15px;
+border-radius:10px;
+margin-top:10px;
+background:#fafafa;
+}
+</style>
+</head>
+<body>
+
+<h1>Password Manager</h1>
+
+<div class="card">
+<h2>Add Password</h2>
+
+<input id="title" placeholder="Title">
+<input id="username" placeholder="Username">
+<input id="password" placeholder="Password">
+<input id="website" placeholder="Website">
+<textarea id="notes" placeholder="Notes"></textarea>
+
+<button onclick="savePassword()">Save Password</button>
+</div>
+
+<div class="card">
+<h2>Add Note</h2>
+
+<input id="noteTitle" placeholder="Note Title">
+<textarea id="noteBody" placeholder="Write your note"></textarea>
+
+<button onclick="saveNote()">Save Note</button>
+</div>
+
+<div class="card">
+<h2>Saved Passwords</h2>
+<div id="passwordList"></div>
+</div>
+
+<div class="card">
+<h2>Saved Notes</h2>
+<div id="noteList"></div>
+</div>
+
+<script>
+let passwords = JSON.parse(localStorage.getItem("passwords") || "[]");
+let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+function savePassword(){
+const item = {
+id: Date.now(),
+title: document.getElementById("title").value,
+username: document.getElementById("username").value,
+password: document.getElementById("password").value,
+website: document.getElementById("website").value,
+notes: document.getElementById("notes").value
+};
+
+passwords.unshift(item);
+localStorage.setItem("passwords", JSON.stringify(passwords));
+renderPasswords();
+}
+
+function saveNote(){
+const item = {
+id: Date.now(),
+title: document.getElementById("noteTitle").value,
+body: document.getElementById("noteBody").value
+};
+
+notes.unshift(item);
+localStorage.setItem("notes", JSON.stringify(notes));
+renderNotes();
+}
+
+function deletePassword(id){
+passwords = passwords.filter(p=>p.id!==id);
+localStorage.setItem("passwords", JSON.stringify(passwords));
+renderPasswords();
+}
+
+function deleteNote(id){
+notes = notes.filter(n=>n.id!==id);
+localStorage.setItem("notes", JSON.stringify(notes));
+renderNotes();
+}
+
+function renderPasswords(){
+const list = document.getElementById("passwordList");
+list.innerHTML = "";
+
+passwords.forEach(item=>{
+list.innerHTML += `
+<div class="item">
+<h3>${item.title}</h3>
+<p><b>Username:</b> ${item.username}</p>
+<p><b>Password:</b> ${item.password}</p>
+<p><b>Website:</b> ${item.website}</p>
+<p>${item.notes}</p>
+<button onclick="deletePassword(${item.id})">Delete</button>
+</div>
+`;
+});
+}
+
+function renderNotes(){
+const list = document.getElementById("noteList");
+list.innerHTML = "";
+
+notes.forEach(item=>{
+list.innerHTML += `
+<div class="item">
+<h3>${item.title}</h3>
+<p>${item.body}</p>
+<button onclick="deleteNote(${item.id})">Delete</button>
+</div>
+`;
+});
+}
+
+renderPasswords();
+renderNotes();
+</script>
+
+</body>
+</html>
